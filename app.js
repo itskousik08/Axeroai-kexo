@@ -124,6 +124,9 @@ function renderNode(id) {
                 <button class="node-btn connect-btn" onclick="startConnect('${id}')" title="Connect to another node">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                 </button>
+                <button class="node-btn unlink-btn" onclick="unlinkNode('${id}')" title="Remove all connections from this node">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
                 <button class="node-btn" onclick="openColorPicker('${id}', event)" title="Change color">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
                 </button>
@@ -403,6 +406,17 @@ function deleteConnection(connId) {
     state.connections = state.connections.filter(c => c.id !== connId);
     renderAllConnections();
     saveData();
+    showToast('Connection removed');
+}
+
+function unlinkNode(id) {
+    const count = state.connections.filter(c => c.from === id || c.to === id).length;
+    if (count === 0) { showToast('No connections to remove'); return; }
+    pushUndo();
+    state.connections = state.connections.filter(c => c.from !== id && c.to !== id);
+    renderAllConnections();
+    saveData();
+    showToast(`Removed ${count} connection${count > 1 ? 's' : ''}`);
 }
 
 function renderAllConnections() {
@@ -418,17 +432,37 @@ function renderAllConnections() {
         path.setAttribute('class', 'connection-path' + (state.selectedConnection === c.id ? ' selected' : ''));
         path.setAttribute('d', buildPath(sp.x, sp.y, ep.x, ep.y, c.fromSide, c.toSide));
         path.dataset.connId = c.id;
-        path.addEventListener('click', () => {
+        path.addEventListener('click', (e) => {
+            e.stopPropagation();
             state.selectedConnection = c.id;
             renderAllConnections();
+            showConnDeleteBtn(c.id, e);
         });
-        path.addEventListener('dblclick', () => deleteConnection(c.id));
+        path.addEventListener('dblclick', (e) => { e.stopPropagation(); deleteConnection(c.id); hideConnDeleteBtn(); });
         svg.appendChild(path);
     });
 }
 
 function updateConnectionsForNode(nodeId) {
     renderAllConnections();
+}
+
+let _connDeleteBtn = null;
+function showConnDeleteBtn(connId, e) {
+    hideConnDeleteBtn();
+    const btn = document.createElement('button');
+    btn.className = 'conn-delete-btn';
+    btn.title = 'Remove connection';
+    btn.style.left = e.clientX + 'px';
+    btn.style.top = e.clientY + 'px';
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    btn.onclick = (ev) => { ev.stopPropagation(); deleteConnection(connId); hideConnDeleteBtn(); };
+    document.body.appendChild(btn);
+    _connDeleteBtn = btn;
+    setTimeout(() => { document.addEventListener('click', hideConnDeleteBtn, { once: true }); }, 50);
+}
+function hideConnDeleteBtn() {
+    if (_connDeleteBtn) { _connDeleteBtn.remove(); _connDeleteBtn = null; }
 }
 
 function getConnectorPos(nodeId, side) {
@@ -766,26 +800,85 @@ function updateMinimap() {
 
 document.getElementById('canvasScroll').addEventListener('scroll', updateMinimap);
 
+// ===== PROJECT SYSTEM =====
+function getActiveProjectId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('project') || localStorage.getItem('kexo_active_project') || 'default';
+}
+const PROJECT_ID = getActiveProjectId();
+
+function getStorageKey(key) {
+    return 'kexo_' + key + '_' + PROJECT_ID;
+}
+
+function updateProjectTimestamp() {
+    try {
+        const projects = JSON.parse(localStorage.getItem('kexo_projects') || '[]');
+        const p = projects.find(x => x.id === PROJECT_ID);
+        if (p) { p.updatedAt = Date.now(); localStorage.setItem('kexo_projects', JSON.stringify(projects)); }
+    } catch(e) {}
+}
+
+function loadProjectName() {
+    try {
+        const projects = JSON.parse(localStorage.getItem('kexo_projects') || '[]');
+        const p = projects.find(x => x.id === PROJECT_ID);
+        const el = document.getElementById('headerProjectName');
+        if (el && p) el.textContent = p.name;
+        else if (el) el.textContent = '';
+    } catch(e) {}
+}
+
+// ===== THEME SYSTEM =====
+function applyTheme() {
+    const theme = localStorage.getItem('kexo_theme') || 'dark';
+    document.body.classList.toggle('light-mode', theme === 'light');
+}
+function toggleTheme() {
+    const isLight = document.body.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+    localStorage.setItem('kexo_theme', newTheme);
+    document.body.classList.toggle('light-mode', !isLight);
+    showToast(newTheme === 'light' ? '☀️ Light mode' : '🌙 Dark mode');
+}
+applyTheme();
+
 // ===== PERSIST =====
 function saveData() {
     try {
-        localStorage.setItem('vidflow_nodes', JSON.stringify(state.nodes));
-        localStorage.setItem('vidflow_connections', JSON.stringify(state.connections));
-        localStorage.setItem('vidflow_nextNodeId', state.nextNodeId);
-        localStorage.setItem('vidflow_nextConnId', state.nextConnId);
-        localStorage.setItem('vidflow_notes', document.getElementById('notepad').innerHTML);
+        localStorage.setItem(getStorageKey('nodes'), JSON.stringify(state.nodes));
+        localStorage.setItem(getStorageKey('connections'), JSON.stringify(state.connections));
+        localStorage.setItem(getStorageKey('nextNodeId'), state.nextNodeId);
+        localStorage.setItem(getStorageKey('nextConnId'), state.nextConnId);
+        localStorage.setItem(getStorageKey('notes'), document.getElementById('notepad').innerHTML);
+        updateProjectTimestamp();
     } catch (e) {}
 }
 
 function loadData() {
     try {
-        const nodes = JSON.parse(localStorage.getItem('vidflow_nodes') || '{}');
-        const conns = JSON.parse(localStorage.getItem('vidflow_connections') || '[]');
-        const notes = localStorage.getItem('vidflow_notes');
+        // Support both legacy single-project keys and new scoped keys
+        const nodesKey = getStorageKey('nodes');
+        const connsKey = getStorageKey('connections');
+        const notesKey = getStorageKey('notes');
+
+        // For default project, try legacy keys as fallback
+        let nodesRaw = localStorage.getItem(nodesKey);
+        let connsRaw = localStorage.getItem(connsKey);
+        let notes = localStorage.getItem(notesKey);
+
+        if (!nodesRaw && PROJECT_ID === 'default') {
+            nodesRaw = localStorage.getItem('vidflow_nodes');
+            connsRaw = localStorage.getItem('vidflow_connections');
+            notes = localStorage.getItem('vidflow_notes');
+        }
+
+        const nodes = JSON.parse(nodesRaw || '{}');
+        const conns = JSON.parse(connsRaw || '[]');
         state.nodes = nodes;
         state.connections = conns;
-        state.nextNodeId = parseInt(localStorage.getItem('vidflow_nextNodeId') || '1');
-        state.nextConnId = parseInt(localStorage.getItem('vidflow_nextConnId') || '1');
+        state.nextNodeId = parseInt(localStorage.getItem(getStorageKey('nextNodeId')) || '1');
+        state.nextConnId = parseInt(localStorage.getItem(getStorageKey('nextConnId')) || '1');
         if (notes) document.getElementById('notepad').innerHTML = notes;
 
         Object.keys(state.nodes).forEach(id => renderNode(id));
@@ -820,6 +913,7 @@ function debounce(fn, delay) {
 
 // ===== INIT =====
 window.addEventListener('load', () => {
+    loadProjectName();
     loadData();
 
     // If no nodes loaded, create welcome node

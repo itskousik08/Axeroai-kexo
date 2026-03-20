@@ -1,237 +1,213 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>kexo AI — Canvas</title>
+    <title>kexo ai — Visual Learning Canvas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="workspace.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- TOP BAR -->
-<header class="ws-topbar">
-    <div class="topbar-left">
-        <a href="index.html" class="back-btn" title="Back to Dashboard">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        </a>
-        <div class="topbar-logo">
-            <img src="assets/logo/kexo-logo-dark.svg" alt="kexo AI" class="logo-img logo-dark">
-            <img src="assets/logo/kexo-logo-light.svg" alt="kexo AI" class="logo-img logo-light">
+
+<!-- HEADER -->
+<header class="app-header">
+    <div class="header-brand">
+        <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
         </div>
-        <div class="topbar-divider"></div>
-        <span class="project-name" id="projectNameDisplay">Untitled Project</span>
+        <span class="brand-name">kexo <em>AI</em></span>
     </div>
-    <div class="topbar-center">
-        <div class="save-status" id="saveStatus">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Saved</span>
-        </div>
+    <span class="header-project-name" id="headerProjectName"></span>
+
+    <div class="header-url-bar">
+        <svg class="url-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        <input type="text" id="ytUrl" placeholder="Paste YouTube URL and press Load…" spellcheck="false">
+        <button class="btn-load" onclick="loadVideo()">Load</button>
     </div>
-    <div class="topbar-right">
-        <div class="zoom-controls">
-            <button onclick="zoomOut()" class="ws-btn" title="Zoom Out">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            </button>
-            <button class="zoom-label" id="zoomLabel" onclick="resetZoom()" title="Reset zoom">100%</button>
-            <button onclick="zoomIn()" class="ws-btn" title="Zoom In">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            </button>
-        </div>
-        <div class="topbar-sep"></div>
-        <button onclick="undo()" class="ws-btn" id="undoBtn" disabled title="Undo (Ctrl+Z)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+
+    <div class="header-actions">
+        <button class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" id="themeToggleBtn">
+            <svg class="theme-icon-dark" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="theme-icon-light" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <button onclick="redo()" class="ws-btn" id="redoBtn" disabled title="Redo (Ctrl+Y)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+        <button class="btn-secondary" onclick="toggleSidebar()" id="sidebar-toggle" title="Toggle Panel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
         </button>
-        <button onclick="toggleGrid()" class="ws-btn" id="gridBtn" title="Toggle Grid">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        </button>
-        <div class="topbar-sep"></div>
-        <button onclick="exportCanvas()" class="ws-btn ws-btn-text" title="Export">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <button class="btn-secondary" onclick="exportCanvas()" title="Export Canvas">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Export</span>
         </button>
+        <a href="dashboard.html" class="btn-dashboard" title="Back to Dashboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+        </a>
     </div>
 </header>
 
-<!-- APP BODY -->
-<div class="ws-body">
+<!-- MAIN LAYOUT -->
+<div class="app-body" id="appBody">
 
     <!-- SIDEBAR -->
-    <aside class="ws-sidebar" id="wsSidebar">
-        <div class="sidebar-section">
-            <div class="sidebar-label">Add Node</div>
-            <button class="sidebar-btn" onclick="addNode('note')">
-                <div class="sbtn-icon note">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <aside class="sidebar" id="sidebar">
+        <!-- VIDEO PLAYER -->
+        <div class="video-section">
+            <div class="video-wrapper" id="videoWrapper">
+                <div id="player"></div>
+                <div class="video-empty" id="videoEmpty">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                    <p>Paste a YouTube URL above</p>
                 </div>
-                <span>Note</span>
-                <kbd>N</kbd>
-            </button>
-            <button class="sidebar-btn" onclick="addNode('concept')">
-                <div class="sbtn-icon concept">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 8v8M8 12h8"/></svg>
-                </div>
-                <span>Concept</span>
-                <kbd>C</kbd>
-            </button>
-            <button class="sidebar-btn" onclick="addNode('question')">
-                <div class="sbtn-icon question">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                </div>
-                <span>Question</span>
-                <kbd>Q</kbd>
-            </button>
-            <button class="sidebar-btn" onclick="document.getElementById('imgInput').click()">
-                <div class="sbtn-icon image">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2.18"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                </div>
-                <span>Image</span>
-                <kbd>I</kbd>
-            </button>
-        </div>
-
-        <div class="sidebar-divider"></div>
-
-        <div class="sidebar-section">
-            <div class="sidebar-label">Coming Soon</div>
-            <button class="sidebar-btn disabled">
-                <div class="sbtn-icon ai">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
-                </div>
-                <span>AI Assistant</span>
-                <span class="soon-chip">Soon</span>
-            </button>
-            <button class="sidebar-btn disabled">
-                <div class="sbtn-icon file">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                <span>File Analysis</span>
-                <span class="soon-chip">Soon</span>
-            </button>
-            <button class="sidebar-btn disabled">
-                <div class="sbtn-icon share">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                </div>
-                <span>Share Canvas</span>
-                <span class="soon-chip">Soon</span>
-            </button>
-        </div>
-
-        <div class="sidebar-divider"></div>
-
-        <div class="sidebar-section shortcuts-section">
-            <div class="sidebar-label">Shortcuts</div>
-            <div class="shortcut-list">
-                <div class="shortcut-item"><kbd>Space</kbd><span>+drag pan</span></div>
-                <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>Z</kbd><span>undo</span></div>
-                <div class="shortcut-item"><kbd>Del</kbd><span>delete</span></div>
-                <div class="shortcut-item"><kbd>Scroll</kbd><span>zoom</span></div>
+            </div>
+            <div class="video-controls" id="videoControls" style="display:none">
+                <div class="timestamp-display" id="timestampDisplay">00:00</div>
+                <button class="btn-capture" onclick="captureTimestamp()" title="Capture this moment as a node">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3A8 8 0 1 0 17.7 17.7M6.3 17.7A8 8 0 0 1 17.7 6.3"/><path d="M20 4l-2 2"/><path d="M4 4l2 2"/><path d="M4 20l2-2"/><path d="M20 20l-2-2"/></svg>
+                    Capture Timestamp
+                </button>
             </div>
         </div>
 
-        <button class="sidebar-collapse-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Collapse sidebar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
+        <!-- NOTEPAD -->
+        <div class="notepad-section">
+            <div class="notepad-header">
+                <span class="section-label">Study Notes</span>
+                <div class="notepad-toolbar">
+                    <button onclick="formatText('bold')" title="Bold" class="fmt-btn"><b>B</b></button>
+                    <button onclick="formatText('italic')" title="Italic" class="fmt-btn"><em>I</em></button>
+                    <button onclick="formatText('underline')" title="Underline" class="fmt-btn"><u>U</u></button>
+                    <div class="toolbar-divider"></div>
+                    <button onclick="formatText('insertUnorderedList')" title="Bullet List" class="fmt-btn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+                    </button>
+                    <button onclick="formatText('insertOrderedList')" title="Numbered List" class="fmt-btn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button onclick="insertHeading()" title="Heading" class="fmt-btn">H</button>
+                    <button onclick="clearNotes()" title="Clear Notes" class="fmt-btn danger">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="notepad-body" id="notepad" contenteditable="true" spellcheck="true">
+                <h3>Welcome to VidFlow AI 🎯</h3>
+                <p>Load a YouTube video above, then start taking notes here. Your notes are <strong>auto-saved</strong>.</p>
+                <ul>
+                    <li>Use the canvas to build a visual mind map</li>
+                    <li>Capture video timestamps as nodes</li>
+                    <li>Connect ideas with drag lines</li>
+                </ul>
+            </div>
+        </div>
     </aside>
 
     <!-- CANVAS AREA -->
     <main class="canvas-area" id="canvasArea">
+        <!-- CANVAS CONTROLS (floating top-right) -->
+        <div class="canvas-controls">
+            <button onclick="zoomIn()" title="Zoom In" class="ctrl-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <span class="zoom-label" id="zoomLabel">100%</span>
+            <button onclick="zoomOut()" title="Zoom Out" class="ctrl-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <div class="ctrl-divider"></div>
+            <button onclick="resetZoom()" title="Reset View" class="ctrl-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+            <button onclick="toggleGrid()" title="Toggle Grid" class="ctrl-btn" id="gridBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </button>
+        </div>
 
-        <!-- INFINITE CANVAS VIEWPORT -->
-        <div class="canvas-viewport" id="canvasViewport">
+        <!-- UNDO/REDO -->
+        <div class="undo-controls">
+            <button onclick="undo()" title="Undo (Ctrl+Z)" class="ctrl-btn" id="undoBtn" disabled>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+            </button>
+            <button onclick="redo()" title="Redo (Ctrl+Y)" class="ctrl-btn" id="redoBtn" disabled>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+            </button>
+        </div>
+
+        <!-- CANVAS SCROLL WRAPPER -->
+        <div class="canvas-scroll" id="canvasScroll">
             <div class="canvas-transform" id="canvasTransform">
-                <!-- SVG connections layer -->
-                <svg class="connections-svg" id="connectionsSvg" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                            <polygon points="0 0, 8 3, 0 6" fill="var(--conn-color, rgba(130,130,180,0.6))"/>
-                        </marker>
-                    </defs>
-                </svg>
-                <!-- Nodes layer -->
-                <div id="nodesLayer"></div>
+                <div class="canvas-infinite" id="canvasInfinite">
+                    <!-- SVG for connections -->
+                    <svg class="connections-svg" id="connectionsSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+                    <!-- Nodes rendered here -->
+                    <div id="nodesLayer"></div>
+                </div>
             </div>
         </div>
 
+        <!-- FLOATING ACTION BUTTONS -->
+        <div class="fab-group">
+            <div class="fab-menu" id="fabMenu">
+                <button class="fab-item" onclick="addNode('concept')" title="Add Concept Node">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
+                    <span>Concept</span>
+                </button>
+                <button class="fab-item" onclick="addNode('question')" title="Add Question Node">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span>Question</span>
+                </button>
+                <button class="fab-item" onclick="addNode('note')" title="Add Note Node">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span>Note</span>
+                </button>
+                <button class="fab-item" onclick="document.getElementById('imgInput').click()" title="Upload Image">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2.18"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Image</span>
+                </button>
+            </div>
+            <button class="fab-main" id="fabMain" onclick="toggleFab()" title="Add Node">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+        </div>
+        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="uploadImageNode(this)">
+
         <!-- CONNECT MODE INDICATOR -->
-        <div class="indicator connect-indicator" id="connectIndicator" style="display:none">
+        <div class="connect-indicator" id="connectIndicator" style="display:none">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span>Click a node to connect</span>
-            <button onclick="cancelConnect()">Cancel</button>
+            Click another node to connect — <button onclick="cancelConnect()">Cancel</button>
         </div>
 
-        <!-- UNLINK INDICATOR -->
-        <div class="indicator unlink-indicator" id="unlinkIndicator" style="display:none">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg>
-            <span>Connection selected</span>
-            <button onclick="unlinkSelected()" class="btn-unlink">Unlink</button>
-        </div>
-
-        <!-- MINIMAP -->
+        <!-- MINI MAP -->
         <div class="minimap" id="minimap">
             <canvas id="minimapCanvas" width="160" height="100"></canvas>
             <div class="minimap-viewport" id="minimapViewport"></div>
         </div>
 
+        <!-- KEYBOARD SHORTCUTS HINT -->
+        <div class="shortcuts-hint">
+            <span>Del — delete</span>
+            <span>Ctrl+Z — undo</span>
+            <span>Space+drag — pan</span>
+        </div>
     </main>
 </div>
 
-<!-- FAB (Fixed, high z-index - CRITICAL BUG FIX) -->
-<div class="fab-group" id="fabGroup" style="position:fixed; bottom:32px; right:32px; z-index:9999;">
-    <div class="fab-menu" id="fabMenu">
-        <button class="fab-item" onclick="addNode('concept')">
-            <div class="fab-item-icon concept">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 8v8M8 12h8"/></svg>
-            </div>
-            <span>Concept</span>
-        </button>
-        <button class="fab-item" onclick="addNode('question')">
-            <div class="fab-item-icon question">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-            <span>Question</span>
-        </button>
-        <button class="fab-item" onclick="addNode('note')">
-            <div class="fab-item-icon note">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <span>Note</span>
-        </button>
-        <button class="fab-item" onclick="document.getElementById('imgInput').click()">
-            <div class="fab-item-icon image">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2.18"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </div>
-            <span>Image</span>
-        </button>
-    </div>
-    <button class="fab-main" id="fabMain" onclick="toggleFab()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-</div>
-
-<!-- IMAGE UPLOAD -->
-<input type="file" id="imgInput" accept="image/*" style="display:none" onchange="uploadImageNode(this)">
-
-<!-- NODE COLOR PICKER -->
+<!-- NODE COLOR PICKER POPUP -->
 <div class="color-popup" id="colorPopup">
-    <div class="color-swatch" data-color="default" onclick="setNodeColor('default')" title="Default"></div>
-    <div class="color-swatch indigo" data-color="indigo" onclick="setNodeColor('indigo')" title="Indigo"></div>
-    <div class="color-swatch blue" data-color="blue" onclick="setNodeColor('blue')" title="Blue"></div>
-    <div class="color-swatch cyan" data-color="cyan" onclick="setNodeColor('cyan')" title="Cyan"></div>
-    <div class="color-swatch green" data-color="green" onclick="setNodeColor('green')" title="Green"></div>
-    <div class="color-swatch amber" data-color="amber" onclick="setNodeColor('amber')" title="Amber"></div>
-    <div class="color-swatch rose" data-color="rose" onclick="setNodeColor('rose')" title="Rose"></div>
-    <div class="color-swatch violet" data-color="violet" onclick="setNodeColor('violet')" title="Violet"></div>
+    <div class="color-swatch" data-color="default" onclick="setNodeColor('default')"></div>
+    <div class="color-swatch blue" data-color="blue" onclick="setNodeColor('blue')"></div>
+    <div class="color-swatch green" data-color="green" onclick="setNodeColor('green')"></div>
+    <div class="color-swatch amber" data-color="amber" onclick="setNodeColor('amber')"></div>
+    <div class="color-swatch rose" data-color="rose" onclick="setNodeColor('rose')"></div>
+    <div class="color-swatch violet" data-color="violet" onclick="setNodeColor('violet')"></div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="workspace.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="app.js"></script>
 </body>
 </html>

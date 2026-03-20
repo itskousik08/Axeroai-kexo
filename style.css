@@ -28,6 +28,46 @@
     --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
 }
 
+/* ===== LIGHT MODE OVERRIDES ===== */
+body.light-mode {
+    --bg: #f4f4f8;
+    --bg2: #ffffff;
+    --bg3: #eeeef5;
+    --surface: #ffffff;
+    --surface2: #f0f0f7;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.13);
+    --text: #12111a;
+    --text2: #5a5970;
+    --text3: #9090a8;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
+}
+
+body.light-mode .canvas-infinite {
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px);
+}
+body.light-mode .canvas-infinite.grid-lines {
+    background-image:
+        linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+body.light-mode .connection-path {
+    stroke: rgba(0,0,0,0.2);
+}
+body.light-mode .connection-path:hover,
+body.light-mode .connection-path.selected { stroke: var(--accent); }
+body.light-mode .node { background: #fff; }
+body.light-mode .node:hover { border-color: rgba(0,0,0,0.22); }
+body.light-mode .minimap { background: rgba(240,240,248,0.92); }
+
+/* ===== THEME TOGGLE ICON ===== */
+.theme-icon-dark { display: block; }
+.theme-icon-light { display: none; }
+body.light-mode .theme-icon-dark { display: none; }
+body.light-mode .theme-icon-light { display: block; }
+
 html, body {
     height: 100%;
     overflow: hidden;
@@ -456,7 +496,7 @@ html, body {
     position: absolute;
     bottom: 24px;
     right: 24px;
-    z-index: 50;
+    z-index: 60; /* increased from 50 to ensure visibility */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -868,6 +908,90 @@ html, body {
     to   { opacity: 1; transform: scale(1); }
 }
 .node { animation: node-in 0.18s ease; }
+
+/* ===== BACK TO DASHBOARD BUTTON ===== */
+.btn-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+}
+.btn-dashboard:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border2);
+}
+
+/* ===== PROJECT NAME IN HEADER ===== */
+.header-project-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text3);
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== THEME TOGGLE IN APP HEADER ===== */
+.btn-theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+.btn-theme-toggle:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border2);
+}
+
+/* ===== CONNECTION UNLINK BUTTON ===== */
+.conn-delete-btn {
+    position: fixed;
+    width: 26px;
+    height: 26px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--rose);
+    cursor: pointer;
+    z-index: 55;
+    transition: all 0.15s;
+    transform: translate(-50%, -50%);
+    box-shadow: var(--shadow);
+    pointer-events: all;
+}
+.conn-delete-btn:hover {
+    background: rgba(242,95,122,0.15);
+    border-color: rgba(242,95,122,0.5);
+    transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* ===== UNLINK BUTTON ON NODE ===== */
+.node-btn.unlink-btn:hover { color: #ff6b35; }
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
