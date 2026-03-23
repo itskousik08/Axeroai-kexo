@@ -1,4 +1,4 @@
-export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type BoxType = 'concept' | 'question' | 'note' | 'image' | 'pdf' | 'voice' | 'youtube' | 'text'
 export type BoxColor = 'default' | 'blue' | 'green' | 'amber' | 'rose' | 'violet'
@@ -68,11 +68,15 @@ export interface Note {
 export type Database = {
   public: {
     Tables: {
-      profiles: { Row: Profile; Insert: Partial<Profile>; Update: Partial<Profile> }
-      workspaces: { Row: Workspace; Insert: Partial<Workspace>; Update: Partial<Workspace> }
-      boxes: { Row: Box; Insert: Partial<Box>; Update: Partial<Box> }
-      connections: { Row: Connection; Insert: Partial<Connection>; Update: Partial<Connection> }
-      notes: { Row: Note; Insert: Partial<Note>; Update: Partial<Note> }
+      profiles: { Row: Profile; Insert: Partial<Profile>; Update: Partial<Profile>; Relationships: [] }
+      workspaces: { Row: Workspace; Insert: Partial<Workspace>; Update: Partial<Workspace>; Relationships: [] }
+      boxes: { Row: Box; Insert: Partial<Box>; Update: Partial<Box>; Relationships: [] }
+      connections: { Row: Connection; Insert: Partial<Connection>; Update: Partial<Connection>; Relationships: [] }
+      notes: { Row: Note; Insert: Partial<Note>; Update: Partial<Note>; Relationships: [] }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
