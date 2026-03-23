@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-syne: 'Syne', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter);
+  background: #0f0f11;
+  color: #f0eff4;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Canvas scrollbar */
+.canvas-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.canvas-scroll::-webkit-scrollbar-track { background: transparent; }
+.canvas-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.canvas-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Waveform override */
+.waveform wave { overflow: hidden !important; }
+
+/* Node selection ring */
+.node-selected { box-shadow: 0 0 0 2px #f5a623, 0 4px 32px rgba(0,0,0,0.4) !important; }
+
+/* Smooth drag */
+.dragging { cursor: grabbing !important; user-select: none !important; }
+
+/* Connection SVG */
+.connection-line { pointer-events: visibleStroke; cursor: pointer; transition: stroke 0.15s; }
+.connection-line:hover { stroke: #f5a623; stroke-width: 3; }
+
+@layer utilities {
+  .font-display { font-family: var(--font-syne); }
+  .text-brand { color: #f5a623; }
+  .bg-surface { background: #17171a; }
+  .bg-surface2 { background: #1e1e22; }
+  .border-subtle { border-color: rgba(255,255,255,0.08); }
+}
