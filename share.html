@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kexo AI — Shared View</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{
+      --bg:#0B0F14;--card:#111827;--border:#1F2937;--border2:#374151;
+      --text:#F9FAFB;--text2:#9CA3AF;--muted:#6B7280;
+      --brand:#4F46E5;--accent:#4F46E5;--accent2:#4338CA;
+      --radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.5);
+    }
+    .share-banner{
+      display:flex;align-items:center;justify-content:space-between;
+      background:rgba(79,70,229,0.08);border-bottom:1px solid rgba(79,70,229,0.2);
+      padding:10px 20px;font-size:13px;color:#818CF8;flex-shrink:0;
+    }
+    .share-badge{display:flex;align-items:center;gap:8px;font-weight:500}
+    .share-badge span{background:rgba(79,70,229,0.15);border:1px solid rgba(79,70,229,0.3);
+      padding:2px 10px;border-radius:100px;font-size:11px;font-weight:600}
+    .share-cta a{color:#818CF8;text-decoration:none;font-weight:600;font-size:12px;
+      border:1px solid rgba(79,70,229,0.3);padding:5px 12px;border-radius:8px;
+      transition:background 0.15s}
+    .share-cta a:hover{background:rgba(79,70,229,0.1)}
+    .brand-icon{background:var(--brand)}
+    .brand-name em{color:var(--brand)}
+  </style>
+</head>
+<body>
+
+<!-- READ-ONLY BANNER -->
+<div class="share-banner">
+  <div class="share-badge">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+    <span>VIEW ONLY</span>
+    Shared workspace — editing is disabled
+  </div>
+  <div class="share-cta">
+    <a href="signup.html">Sign up to create your own →</a>
+  </div>
+</div>
+
+<!-- HEADER (simplified) -->
+<header class="app-header">
+  <div class="header-brand">
+    <img src="assets/logo/logo.svg" alt="Kexo AI" class="brand-logo"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="brand-icon" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <span class="brand-name">Kexo <em>AI</em></span>
+  </div>
+  <span class="header-project-name" id="headerProjectName">Loading…</span>
+  <div class="header-actions">
+    <a href="signup.html" style="display:flex;align-items:center;gap:6px;background:var(--brand);
+      color:#fff;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
+      Get Started Free
+    </a>
+  </div>
+</header>
+
+<!-- CANVAS AREA (read-only) -->
+<div class="app-body" id="appBody">
+  <main class="canvas-area" id="canvasArea" style="flex:1">
+    <div class="canvas-controls">
+      <button onclick="zoomIn()" class="ctrl-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+        </svg>
+      </button>
+      <span class="zoom-label" id="zoomLabel">100%</span>
+      <button onclick="zoomOut()" class="ctrl-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <line x1="8" y1="11" x2="14" y2="11"/>
+        </svg>
+      </button>
+      <div class="ctrl-divider"></div>
+      <button onclick="resetZoom()" class="ctrl-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+        </svg>
+      </button>
+    </div>
+    <div class="canvas-scroll" id="canvasScroll">
+      <div class="canvas-transform" id="canvasTransform">
+        <div class="canvas-infinite grid-lines" id="canvasInfinite">
+          <svg class="connections-svg" id="connectionsSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div id="nodesLayer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="minimap" id="minimap">
+      <canvas id="minimapCanvas" width="160" height="100"></canvas>
+      <div class="minimap-viewport" id="minimapViewport"></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config/config.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app = initializeApp(KEXO_CONFIG.firebase);
+  const db  = getFirestore(app);
+  const params = new URLSearchParams(location.search);
+  const projectId = params.get("id");
+
+  if (!projectId) { document.getElementById("headerProjectName").textContent = "Invalid link"; }
+  else {
+    getDoc(doc(db, "projects", projectId)).then(snap => {
+      if (!snap.exists()) { document.getElementById("headerProjectName").textContent = "Project not found"; return; }
+      const data = snap.data();
+      document.getElementById("headerProjectName").textContent = data.name || "Shared Project";
+      document.title = `Kexo AI — ${data.name||"Shared"}`;
+      window.KEXO_PROJECT = { id: projectId, data };
+      window.KEXO_READONLY = true;
+      if (typeof window.kexoInit === "function") window.kexoInit(data);
+      else window.addEventListener("kexo-app-ready", () => window.kexoInit(data));
+    }).catch(() => {
+      document.getElementById("headerProjectName").textContent = "Error loading project";
+    });
+  }
+</script>
+<script src="js/workspace.js"></script>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kexo AI — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0B0F14;--card:#111827;--border:#1F2937;--border2:#374151;
+      --text:#F9FAFB;--text2:#9CA3AF;--muted:#6B7280;
+      --brand:#4F46E5;--brand-h:#4338CA;--success:#22C55E;--error:#EF4444;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+      font-size:14px;-webkit-font-smoothing:antialiased}
+
+    /* ─── HEADER ─── */
+    .header{height:56px;background:var(--card);border-bottom:1px solid var(--border);
+      display:flex;align-items:center;padding:0 20px;gap:16px;
+      position:sticky;top:0;z-index:100}
+    .header-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+    .header-logo img{height:28px;width:auto}
+    .brand-fallback{width:28px;height:28px;background:var(--brand);border-radius:7px;
+      display:flex;align-items:center;justify-content:center}
+    .brand-name{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.2px}
+    .header-sep{width:1px;height:18px;background:var(--border2)}
+    .header-title{font-size:13px;color:var(--muted);font-weight:500}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+    .btn-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+      background:transparent;border:1px solid var(--border);border-radius:8px;
+      color:var(--text2);cursor:pointer;transition:all 0.15s;position:relative}
+    .btn-icon:hover{background:var(--card);border-color:var(--border2);color:var(--text)}
+
+    .invite-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;
+      background:var(--error);border-radius:50%;font-size:10px;font-weight:700;
+      color:#fff;display:flex;align-items:center;justify-content:center;display:none}
+
+    .avatar{width:32px;height:32px;border-radius:50%;background:var(--brand);
+      display:flex;align-items:center;justify-content:center;font-weight:600;
+      font-size:13px;color:#fff;cursor:pointer;overflow:hidden;flex-shrink:0}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+
+    /* ─── LAYOUT ─── */
+    .dash-body{max-width:1080px;margin:0 auto;padding:36px 24px}
+
+    /* ─── WELCOME ─── */
+    .welcome{margin-bottom:32px}
+    .welcome h1{font-size:24px;font-weight:700;letter-spacing:-0.4px;margin-bottom:4px}
+    .welcome p{color:var(--text2);font-size:14px}
+
+    /* ─── STATS ─── */
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px}
+    .stat-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+    .stat-value{font-size:28px;font-weight:700;letter-spacing:-0.5px}
+    .stat-sub{font-size:12px;color:var(--text2);margin-top:4px}
+
+    /* ─── TOOLBAR ─── */
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+    .search-wrap{flex:1;position:relative;max-width:340px}
+    .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .search-input{width:100%;background:var(--card);border:1px solid var(--border);
+      border-radius:9px;padding:9px 12px 9px 34px;font-size:13px;color:var(--text);
+      font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+    .search-input:focus{border-color:var(--brand)}
+    .search-input::placeholder{color:var(--muted)}
+
+    .btn-sm{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;
+      font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;
+      font-family:'Inter',sans-serif}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary:hover{background:var(--brand-h)}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+    .btn-outline:hover{border-color:var(--border2);color:var(--text)}
+
+    /* ─── PROJECTS GRID ─── */
+    .projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+    .project-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+      padding:20px;cursor:pointer;transition:border-color 0.15s,transform 0.1s;
+      text-decoration:none;display:flex;flex-direction:column;gap:12px}
+    .project-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+
+    .project-icon{width:40px;height:40px;border-radius:10px;background:rgba(79,70,229,0.12);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .project-name{font-weight:600;font-size:15px;margin-bottom:2px;color:var(--text)}
+    .project-meta{font-size:12px;color:var(--muted)}
+    .project-footer{display:flex;align-items:center;justify-content:space-between;
+      padding-top:10px;border-top:1px solid var(--border)}
+    .role-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:100px;
+      background:rgba(79,70,229,0.12);color:#818CF8}
+    .role-badge.editor{background:rgba(34,197,94,0.1);color:#4ADE80}
+    .project-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.15s}
+    .project-card:hover .project-actions{opacity:1}
+    .action-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+      background:transparent;border:1px solid var(--border);border-radius:7px;
+      color:var(--muted);cursor:pointer;transition:all 0.15s}
+    .action-btn:hover{background:var(--border);color:var(--text)}
+    .action-btn.danger:hover{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--error)}
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state{text-align:center;padding:64px 24px;color:var(--text2)}
+    .empty-icon{width:56px;height:56px;background:var(--card);border:1px solid var(--border);
+      border-radius:14px;display:flex;align-items:center;justify-content:center;
+      margin:0 auto 16px}
+    .empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
+    .empty-state p{font-size:13px;margin-bottom:20px}
+
+    /* ─── SKELETON ─── */
+    .skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .skeleton-line{background:linear-gradient(90deg,var(--border) 25%,var(--border2) 50%,var(--border) 75%);
+      background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:5px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* ─── MODALS ─── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);
+      display:flex;align-items:center;justify-content:center;
+      z-index:200;opacity:0;pointer-events:none;transition:opacity 0.2s;padding:20px}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;
+      padding:28px;width:100%;max-width:420px;
+      transform:translateY(8px);transition:transform 0.2s}
+    .modal-overlay.open .modal{transform:translateY(0)}
+    .modal-title{font-size:17px;font-weight:700;margin-bottom:6px;letter-spacing:-0.2px}
+    .modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+    .modal-field{margin-bottom:14px}
+    .modal-field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+    .modal-field input{width:100%;background:var(--bg);border:1px solid var(--border);
+      border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);
+      font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+    .modal-field input:focus{border-color:var(--brand)}
+    .modal-field input::placeholder{color:var(--muted)}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+    /* ─── INVITE PANEL ─── */
+    .invites-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+    .invite-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;
+      padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .invite-info{flex:1}
+    .invite-project{font-weight:600;font-size:14px;margin-bottom:2px}
+    .invite-from{font-size:12px;color:var(--muted)}
+    .invite-actions{display:flex;gap:6px}
+
+    /* ─── USER MENU ─── */
+    .user-menu{position:absolute;top:calc(100% + 8px);right:0;width:200px;
+      background:var(--card);border:1px solid var(--border);border-radius:12px;
+      padding:6px;z-index:300;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+    .user-menu.open{display:block}
+    .menu-item{display:flex;align-items:center;gap:10px;padding:9px 12px;
+      border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;
+      transition:background 0.1s;text-decoration:none}
+    .menu-item:hover{background:var(--border);color:var(--text)}
+    .menu-item.danger:hover{background:rgba(239,68,68,0.1);color:var(--error)}
+    .menu-sep{height:1px;background:var(--border);margin:4px 0}
+    .menu-user{padding:10px 12px;margin-bottom:4px}
+    .menu-user-name{font-weight:600;font-size:14px;margin-bottom:2px}
+    .menu-user-uid{font-size:11px;color:var(--muted);font-family:'Courier New',monospace}
+
+    /* responsive */
+    @media(max-width:640px){
+      .stats{grid-template-columns:1fr;gap:10px}
+      .projects-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <a class="header-logo" href="dashboard.html">
+    <img src="assets/logo/logo.svg" alt="Kexo AI"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="brand-fallback" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <span class="brand-name">Kexo AI</span>
+  </a>
+  <div class="header-sep"></div>
+  <span class="header-title">Dashboard</span>
+  <div class="header-right">
+    <!-- Invites bell -->
+    <button class="btn-icon" id="invitesBell" onclick="toggleInvitesModal()" title="Invites">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <span class="invite-badge" id="inviteBadge">0</span>
+    </button>
+    <!-- Avatar + menu -->
+    <div style="position:relative">
+      <div class="avatar" id="userAvatar" onclick="toggleUserMenu()">
+        <span id="avatarInitials">?</span>
+      </div>
+      <div class="user-menu" id="userMenu">
+        <div class="menu-user">
+          <div class="menu-user-name" id="menuName">—</div>
+          <div class="menu-user-uid" id="menuUID">UID: —</div>
+        </div>
+        <div class="menu-sep"></div>
+        <a class="menu-item" href="profile.html">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+        <div class="menu-item danger" onclick="handleSignOut()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign out
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── MAIN ─── -->
+<main class="dash-body">
+  <div class="welcome">
+    <h1 id="welcomeText">Good morning 👋</h1>
+    <p id="welcomeSub">Here's your workspace overview</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Projects</div>
+      <div class="stat-value" id="statProjects">—</div>
+      <div class="stat-sub">All workspaces</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Owned</div>
+      <div class="stat-value" id="statOwned">—</div>
+      <div class="stat-sub">You created</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Shared</div>
+      <div class="stat-value" id="statShared">—</div>
+      <div class="stat-sub">Collaborating</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input class="search-input" id="searchInput" placeholder="Search projects…" oninput="filterProjects()">
+    </div>
+    <button class="btn-sm btn-outline" onclick="openInviteModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <line x1="23" y1="11" x2="17" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/>
+      </svg>
+      Invite
+    </button>
+    <button class="btn-sm btn-primary" onclick="openNewModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Project
+    </button>
+  </div>
+
+  <!-- Projects -->
+  <div class="projects-grid" id="projectsGrid">
+    <!-- skeleton -->
+    <div class="skeleton-card">
+      <div class="skeleton-line" style="width:50%;height:14px;margin-bottom:10px"></div>
+      <div class="skeleton-line" style="width:80%;height:11px;margin-bottom:6px"></div>
+      <div class="skeleton-line" style="width:65%;height:11px"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line" style="width:55%;height:14px;margin-bottom:10px"></div>
+      <div class="skeleton-line" style="width:75%;height:11px;margin-bottom:6px"></div>
+      <div class="skeleton-line" style="width:60%;height:11px"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line" style="width:45%;height:14px;margin-bottom:10px"></div>
+      <div class="skeleton-line" style="width:70%;height:11px;margin-bottom:6px"></div>
+      <div class="skeleton-line" style="width:55%;height:11px"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ─── NEW PROJECT MODAL ─── -->
+<div class="modal-overlay" id="newModal">
+  <div class="modal">
+    <h2 class="modal-title">New Project</h2>
+    <p class="modal-sub">Give your workspace a name to get started.</p>
+    <div class="modal-field">
+      <label>Project name</label>
+      <input type="text" id="newProjectName" placeholder="e.g. Research Q1, Product Ideas…">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('newModal')">Cancel</button>
+      <button class="btn-sm btn-primary" id="createBtn" onclick="createProject()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── INVITE USER MODAL ─── -->
+<div class="modal-overlay" id="inviteModal">
+  <div class="modal">
+    <h2 class="modal-title">Invite Collaborator</h2>
+    <p class="modal-sub">Enter their 10-digit Kexo UID to invite them to a project.</p>
+    <div class="modal-field">
+      <label>Kexo UID</label>
+      <input type="text" id="inviteUID" placeholder="1234567890" maxlength="10">
+    </div>
+    <div class="modal-field">
+      <label>Select Project</label>
+      <select id="inviteProject" style="width:100%;background:var(--bg);border:1px solid var(--border);
+        border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);
+        font-family:'Inter',sans-serif;outline:none">
+        <option value="">Choose a project…</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('inviteModal')">Cancel</button>
+      <button class="btn-sm btn-primary" id="inviteBtn" onclick="sendInvite()">Send Invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MY INVITES MODAL ─── -->
+<div class="modal-overlay" id="invitesModal">
+  <div class="modal" style="max-width:480px">
+    <h2 class="modal-title">Pending Invites</h2>
+    <p class="modal-sub">Accept or decline project invitations.</p>
+    <div class="invites-list" id="invitesList">
+      <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">
+        Loading invites…
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('invitesModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DELETE CONFIRM ─── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="max-width:380px">
+    <h2 class="modal-title" style="color:var(--error)">Delete Project</h2>
+    <p class="modal-sub">This action cannot be undone. The project and all its data will be permanently deleted.</p>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-sm btn-primary" id="confirmDeleteBtn"
+        style="background:var(--error)" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="config/config.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, deleteDoc, addDoc,
+    collection, query, where, getDocs, orderBy, serverTimestamp, limit, writeBatch
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app  = initializeApp(KEXO_CONFIG.firebase);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let currentUID = null;
+  let userData   = null;
+  let allProjects = [];
+  let pendingDeleteId = null;
+
+  // ─── Toast ───────────────────────────────────────────────────────────────
+  function toast(msg, type="info") {
+    let c = document.getElementById("tc");
+    if (!c) { c=document.createElement("div"); c.id="tc"; c.style.cssText=
+      "position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none";
+      document.body.appendChild(c); }
+    const t=document.createElement("div");
+    const colors={info:"#4F46E5",success:"#22C55E",error:"#EF4444"};
+    t.style.cssText=`display:flex;align-items:center;gap:10px;background:#111827;
+      border:1px solid #1F2937;border-left:3px solid ${colors[type]||colors.info};
+      color:#F9FAFB;padding:12px 16px;border-radius:10px;font-size:13px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:auto;cursor:pointer;max-width:300px;
+      animation:stIn 0.3s ease;font-family:'Inter',sans-serif`;
+    t.innerHTML=msg; t.onclick=()=>t.remove();
+    if(!document.getElementById("stIn")){const s=document.createElement("style");
+      s.id="stIn";s.textContent="@keyframes stIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}";
+      document.head.appendChild(s);}
+    c.appendChild(t); setTimeout(()=>t.remove(),4000);
+  }
+
+  // ─── Auth guard ──────────────────────────────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href="login.html"; return; }
+    currentUID = user.uid;
+    const snap = await getDoc(doc(db,"users",user.uid));
+    if (!snap.exists()) { window.location.href="login.html"; return; }
+    userData = snap.data();
+    if (userData.blocked) { await signOut(auth); window.location.href="login.html"; return; }
+    renderHeader();
+    await loadProjects();
+    await loadPendingInvites();
+  });
+
+  function renderHeader() {
+    const name = `${userData.firstName||""} ${userData.lastName||""}`.trim() || userData.email;
+    const initials = [userData.firstName?.[0], userData.lastName?.[0]].filter(Boolean).join("").toUpperCase() || "?";
+    document.getElementById("avatarInitials").textContent = initials;
+    if (userData.photoURL) {
+      document.getElementById("userAvatar").innerHTML = `<img src="${userData.photoURL}" alt="${name}">`;
+    }
+    document.getElementById("menuName").textContent = name;
+    document.getElementById("menuUID").textContent = `UID: ${userData.kexoUID||"—"}`;
+
+    const h = new Date().getHours();
+    const greeting = h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+    document.getElementById("welcomeText").textContent = `${greeting}, ${userData.firstName||"there"} 👋`;
+    document.getElementById("welcomeSub").textContent = "Here's your workspace overview";
+  }
+
+  async function loadProjects() {
+    try {
+      const q = query(collection(db,"projects"), where("members","array-contains",currentUID), orderBy("updatedAt","desc"));
+      const snap = await getDocs(q);
+      allProjects = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderProjects(allProjects);
+      updateStats();
+    } catch(e) {
+      document.getElementById("projectsGrid").innerHTML = `<div style="color:var(--text2);font-size:13px;padding:20px">
+        Could not load projects. Check Firestore rules or add the composite index for (members, updatedAt).</div>`;
+    }
+  }
+
+  function updateStats() {
+    const total = allProjects.length;
+    const owned = allProjects.filter(p => p.roles?.[currentUID]==="owner").length;
+    document.getElementById("statProjects").textContent = total;
+    document.getElementById("statOwned").textContent = owned;
+    document.getElementById("statShared").textContent = total - owned;
+  }
+
+  function renderProjects(projects) {
+    const grid = document.getElementById("projectsGrid");
+    if (!projects.length) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </div>
+        <h3>No projects yet</h3>
+        <p>Create your first project to get started</p>
+        <button class="btn-sm btn-primary" onclick="openNewModal()" style="margin:0 auto">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          New Project
+        </button>
+      </div>`;
+      return;
+    }
+    grid.innerHTML = projects.map(p => {
+      const role = p.roles?.[currentUID] || "viewer";
+      const memberCount = (p.members||[]).length;
+      const updated = p.updatedAt?.toDate ? timeAgo(p.updatedAt.toDate()) : "—";
+      const isOwner = role === "owner";
+      return `
+        <div class="project-card" onclick="openProject('${p.id}')">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div class="project-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="project-name">${escHtml(p.name||"Untitled")}</div>
+              <div class="project-meta">${memberCount} member${memberCount!==1?"s":""} · ${updated}</div>
+            </div>
+          </div>
+          <div class="project-footer">
+            <span class="role-badge ${role!=="owner"?"editor":""}">${role}</span>
+            <div class="project-actions" onclick="event.stopPropagation()">
+              <button class="action-btn" onclick="copyShareLink('${p.id}')" title="Share">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+              </button>
+              <button class="action-btn" onclick="exportProject('${p.id}')" title="Export JSON">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </button>
+              ${isOwner ? `<button class="action-btn danger" onclick="deleteProject('${p.id}')" title="Delete">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                  <path d="M10 11v6"/><path d="M14 11v6"/>
+                </svg>
+              </button>` : ""}
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+
+    // populate invite project dropdown
+    const sel = document.getElementById("inviteProject");
+    const myProjects = allProjects.filter(p => p.roles?.[currentUID]==="owner");
+    sel.innerHTML = `<option value="">Choose a project…</option>` +
+      myProjects.map(p => `<option value="${p.id}">${escHtml(p.name)}</option>`).join("");
+  }
+
+  async function loadPendingInvites() {
+    const q = query(collection(db,"invites"), where("toUID","==",currentUID), where("status","==","pending"));
+    const snap = await getDocs(q);
+    const count = snap.size;
+    const badge = document.getElementById("inviteBadge");
+    if (count > 0) { badge.style.display="flex"; badge.textContent=count; }
+    else badge.style.display="none";
+    window._pendingInvites = snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
+
+  // ─── Project actions ─────────────────────────────────────────────────────
+  window.openProject = id => { window.location.href=`workspace.html?id=${id}`; };
+
+  window.copyShareLink = id => {
+    const link = `${location.origin}/share.html?id=${id}&mode=view`;
+    navigator.clipboard.writeText(link).then(()=>toast("Share link copied!","success"));
+  };
+
+  window.exportProject = async id => {
+    const proj = allProjects.find(p=>p.id===id);
+    if (!proj) return;
+    const data = { _version:"2.0", _exportedAt:new Date().toISOString(),
+      id:proj.id, name:proj.name, nodes:proj.nodes||{},
+      links:proj.links||[], metadata:{members:proj.members, createdBy:proj.createdBy} };
+    const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement("a"),{href:url,download:`${(proj.name||"project").replace(/\s+/g,"-")}-kexo.json`});
+    a.click(); URL.revokeObjectURL(url);
+    toast("Project exported as JSON","success");
+  };
+
+  window.deleteProject = id => { pendingDeleteId=id; openModal("deleteModal"); };
+  window.confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    try {
+      await deleteDoc(doc(db,"projects",pendingDeleteId));
+      allProjects = allProjects.filter(p=>p.id!==pendingDeleteId);
+      renderProjects(filterSearch()); updateStats();
+      closeModal("deleteModal"); toast("Project deleted","success");
+    } catch(e){ toast("Could not delete: "+e.message,"error"); }
+    pendingDeleteId = null;
+  };
+
+  // ─── New project ─────────────────────────────────────────────────────────
+  window.openNewModal = () => { document.getElementById("newProjectName").value=""; openModal("newModal"); };
+  window.createProject = async () => {
+    const name = document.getElementById("newProjectName").value.trim();
+    if (!name) { toast("Please enter a project name","error"); return; }
+    const btn = document.getElementById("createBtn");
+    btn.disabled=true; btn.textContent="Creating…";
+    try {
+      const ref = await addDoc(collection(db,"projects"),{
+        name, members:[currentUID], roles:{[currentUID]:"owner"},
+        nodes:{}, links:[], createdAt:serverTimestamp(), updatedAt:serverTimestamp(), createdBy:currentUID,
+      });
+      closeModal("newModal");
+      window.location.href=`workspace.html?id=${ref.id}`;
+    } catch(e){ toast(e.message,"error"); btn.disabled=false; btn.textContent="Create"; }
+  };
+
+  // ─── Invite ──────────────────────────────────────────────────────────────
+  window.openInviteModal = () => openModal("inviteModal");
+  window.sendInvite = async () => {
+    const uid = document.getElementById("inviteUID").value.trim();
+    const pid = document.getElementById("inviteProject").value;
+    if (!uid||uid.length!==10) { toast("Enter a valid 10-digit UID","error"); return; }
+    if (!pid) { toast("Select a project","error"); return; }
+    const btn=document.getElementById("inviteBtn"); btn.disabled=true; btn.textContent="Sending…";
+    try {
+      const q = query(collection(db,"users"), where("kexoUID","==",uid), limit(1));
+      const snap = await getDocs(q);
+      if (snap.empty) { toast("User not found","error"); btn.disabled=false; btn.textContent="Send Invite"; return; }
+      const toUID = snap.docs[0].id;
+      await addDoc(collection(db,"invites"),{toUID,projectId:pid,fromUID:currentUID,
+        status:"pending",createdAt:serverTimestamp()});
+      closeModal("inviteModal"); toast("Invite sent!","success");
+    } catch(e){ toast(e.message,"error"); }
+    btn.disabled=false; btn.textContent="Send Invite";
+  };
+
+  // ─── My Invites ───────────────────────────────────────────────────────────
+  window.toggleInvitesModal = async () => {
+    const invites = window._pendingInvites||[];
+    const list = document.getElementById("invitesList");
+    if (!invites.length) {
+      list.innerHTML=`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No pending invites 🎉</div>`;
+    } else {
+      list.innerHTML = await Promise.all(invites.map(async inv => {
+        const pSnap = await getDoc(doc(db,"projects",inv.projectId));
+        const pName = pSnap.exists() ? pSnap.data().name : "Unknown Project";
+        const fSnap = await getDoc(doc(db,"users",inv.fromUID));
+        const fName = fSnap.exists() ? `${fSnap.data().firstName} ${fSnap.data().lastName}`.trim() : "Someone";
+        return `<div class="invite-item">
+          <div class="invite-info">
+            <div class="invite-project">${escHtml(pName)}</div>
+            <div class="invite-from">Invited by ${escHtml(fName)}</div>
+          </div>
+          <div class="invite-actions">
+            <button class="btn-sm btn-primary" style="padding:6px 12px;font-size:12px"
+              onclick="acceptInvite('${inv.id}','${inv.projectId}')">Accept</button>
+            <button class="btn-sm btn-outline" style="padding:6px 12px;font-size:12px"
+              onclick="declineInvite('${inv.id}')">Decline</button>
+          </div>
+        </div>`;
+      })).then(arr=>arr.join(""));
+    }
+    openModal("invitesModal");
+  };
+
+  window.acceptInvite = async (inviteId, projectId) => {
+    try {
+      const batch = writeBatch(db);
+      batch.update(doc(db,"invites",inviteId),{status:"accepted"});
+      const pRef = doc(db,"projects",projectId);
+      const pSnap = await getDoc(pRef);
+      if (pSnap.exists()) {
+        const d = pSnap.data();
+        const members=[...(d.members||[])];
+        if (!members.includes(currentUID)) members.push(currentUID);
+        batch.update(pRef,{members,roles:{...(d.roles||{}),[currentUID]:"editor"}});
+      }
+      await batch.commit();
+      toast("Joined project!","success");
+      closeModal("invitesModal");
+      await loadProjects();
+      await loadPendingInvites();
+    } catch(e){ toast(e.message,"error"); }
+  };
+
+  window.declineInvite = async id => {
+    await setDoc(doc(db,"invites",id),{status:"declined"},{merge:true});
+    window._pendingInvites = (window._pendingInvites||[]).filter(i=>i.id!==id);
+    await loadPendingInvites();
+    toast("Invite declined","info");
+    closeModal("invitesModal");
+  };
+
+  // ─── Search ──────────────────────────────────────────────────────────────
+  function filterSearch() {
+    const q = document.getElementById("searchInput").value.toLowerCase();
+    return allProjects.filter(p => (p.name||"").toLowerCase().includes(q));
+  }
+  window.filterProjects = () => renderProjects(filterSearch());
+
+  // ─── User menu ───────────────────────────────────────────────────────────
+  window.toggleUserMenu = () => document.getElementById("userMenu").classList.toggle("open");
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#userAvatar")&&!e.target.closest("#userMenu"))
+      document.getElementById("userMenu").classList.remove("open");
+  });
+  window.handleSignOut = async () => { await signOut(auth); window.location.href="login.html"; };
+
+  // ─── Modal helpers ────────────────────────────────────────────────────────
+  function openModal(id) { document.getElementById(id).classList.add("open"); }
+  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+  window.openModal=openModal; window.closeModal=closeModal;
+  document.querySelectorAll(".modal-overlay").forEach(m => {
+    m.addEventListener("click", e => { if(e.target===m) m.classList.remove("open"); });
+  });
+  document.addEventListener("keydown", e => {
+    if(e.key==="Escape") document.querySelectorAll(".modal-overlay.open").forEach(m=>m.classList.remove("open"));
+    if(e.key==="Enter"&&document.getElementById("newModal").classList.contains("open")) window.createProject();
+  });
+
+  // ─── Utils ───────────────────────────────────────────────────────────────
+  function escHtml(s){ const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+  function timeAgo(d){ const s=Math.floor((Date.now()-d.getTime())/1000);
+    if(s<60)return"just now"; if(s<3600)return`${Math.floor(s/60)}m ago`;
+    if(s<86400)return`${Math.floor(s/3600)}h ago`; return`${Math.floor(s/86400)}d ago`; }
+</script>
+</body>
+</html>

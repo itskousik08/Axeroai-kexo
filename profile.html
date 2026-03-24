@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kexo AI — Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0B0F14;--card:#111827;--border:#1F2937;--border2:#374151;
+      --text:#F9FAFB;--text2:#9CA3AF;--muted:#6B7280;
+      --brand:#4F46E5;--brand-h:#4338CA;--success:#22C55E;--error:#EF4444;}
+    html,body{min-height:100%;background:var(--bg);color:var(--text);
+      font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+    .header{height:56px;background:var(--card);border-bottom:1px solid var(--border);
+      display:flex;align-items:center;padding:0 20px;gap:14px;position:sticky;top:0;z-index:100}
+    .header-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+    .header-logo img{height:26px;width:auto}
+    .brand-name{font-size:15px;font-weight:700;color:var(--text)}
+    .header-sep{width:1px;height:18px;background:var(--border2)}
+    .page-title{font-size:13px;color:var(--muted)}
+    .back-btn{margin-left:auto;display:flex;align-items:center;gap:6px;
+      background:transparent;border:1px solid var(--border);border-radius:8px;
+      color:var(--text2);padding:7px 12px;font-size:13px;cursor:pointer;
+      text-decoration:none;transition:all 0.15s;font-family:'Inter',sans-serif}
+    .back-btn:hover{border-color:var(--border2);color:var(--text)}
+
+    .page-body{max-width:640px;margin:0 auto;padding:40px 24px}
+    .section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+      padding:28px;margin-bottom:20px}
+    .section-title{font-size:15px;font-weight:600;margin-bottom:4px}
+    .section-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+
+    .avatar-wrap{display:flex;align-items:center;gap:20px;margin-bottom:24px}
+    .avatar-big{width:72px;height:72px;border-radius:50%;background:var(--brand);
+      display:flex;align-items:center;justify-content:center;font-size:26px;
+      font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;cursor:pointer;
+      border:2px solid var(--border2);position:relative}
+    .avatar-big img{width:100%;height:100%;object-fit:cover}
+    .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);
+      display:flex;align-items:center;justify-content:center;opacity:0;
+      transition:opacity 0.15s;border-radius:50%}
+    .avatar-big:hover .avatar-overlay{opacity:1}
+    .avatar-info h3{font-size:16px;font-weight:600;margin-bottom:4px}
+    .avatar-info p{font-size:12px;color:var(--muted)}
+
+    .uid-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;
+      padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:24px}
+    .uid-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+    .uid-value{font-family:'Courier New',monospace;font-size:16px;letter-spacing:1px;font-weight:600}
+    .copy-btn{display:flex;align-items:center;gap:6px;background:transparent;
+      border:1px solid var(--border);border-radius:7px;color:var(--text2);
+      padding:6px 10px;font-size:12px;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif}
+    .copy-btn:hover{border-color:var(--border2);color:var(--text)}
+
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+    .field input{width:100%;background:var(--bg);border:1px solid var(--border);
+      border-radius:9px;padding:10px 12px;font-size:14px;color:var(--text);
+      font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+    .field input:focus{border-color:var(--brand)}
+    .field input::placeholder{color:var(--muted)}
+    .field input[readonly]{opacity:0.6;cursor:not-allowed}
+
+    .btn-primary{display:flex;align-items:center;gap:6px;padding:10px 18px;border-radius:9px;
+      background:var(--brand);border:none;color:#fff;font-size:13px;font-weight:600;
+      cursor:pointer;transition:background 0.15s;font-family:'Inter',sans-serif}
+    .btn-primary:hover{background:var(--brand-h)}
+    .btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+
+    .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);
+      border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    #toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;
+      display:flex;flex-direction:column;gap:10px;pointer-events:none}
+  </style>
+</head>
+<body>
+<header class="header">
+  <a class="header-logo" href="dashboard.html">
+    <img src="assets/logo/logo.svg" alt="Kexo AI"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:none;width:26px;height:26px;background:var(--brand);border-radius:7px;
+         flex-shrink:0;align-items:center;justify-content:center">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <span class="brand-name">Kexo AI</span>
+  </a>
+  <div class="header-sep"></div>
+  <span class="page-title">Profile</span>
+  <a class="back-btn" href="dashboard.html">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Dashboard
+  </a>
+</header>
+
+<div class="page-body">
+  <!-- Avatar & UID -->
+  <div class="section">
+    <h2 class="section-title">Your Profile</h2>
+    <p class="section-sub">Manage your personal information and profile photo.</p>
+
+    <div class="avatar-wrap">
+      <div class="avatar-big" id="avatarEl" onclick="triggerAvatarUpload()">
+        <span id="avatarInitials">?</span>
+        <div class="avatar-overlay">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="avatar-info">
+        <h3 id="profileName">Loading…</h3>
+        <p id="profileEmail">—</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px">Click photo to change</p>
+      </div>
+    </div>
+
+    <div class="uid-box">
+      <div>
+        <div class="uid-label">YOUR PERMANENT KEXO UID</div>
+        <div class="uid-value" id="profileUID">—</div>
+      </div>
+      <button class="copy-btn" onclick="copyUID()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+        Copy
+      </button>
+    </div>
+
+    <div class="field">
+      <label>First name</label>
+      <input type="text" id="editFirst" placeholder="First name">
+    </div>
+    <div class="field">
+      <label>Last name</label>
+      <input type="text" id="editLast" placeholder="Last name">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="editEmail" readonly>
+    </div>
+
+    <button class="btn-primary" id="saveBtn" onclick="saveProfile()">
+      Save changes
+    </button>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script src="config/config.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app  = initializeApp(KEXO_CONFIG.firebase);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  let uid, userData;
+
+  function toast(msg, type="info") {
+    const c=document.getElementById("toast-wrap");
+    const t=document.createElement("div");
+    const colors={info:"#4F46E5",success:"#22C55E",error:"#EF4444"};
+    t.style.cssText=`display:flex;align-items:center;gap:10px;background:#111827;
+      border:1px solid #1F2937;border-left:3px solid ${colors[type]};
+      color:#F9FAFB;padding:12px 16px;border-radius:10px;font-size:13px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:auto;cursor:pointer;
+      font-family:'Inter',sans-serif;animation:stIn 0.3s ease;max-width:280px`;
+    if(!document.getElementById("stIn")){const s=document.createElement("style");
+      s.id="stIn";s.textContent="@keyframes stIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}";document.head.appendChild(s);}
+    t.textContent=msg; t.onclick=()=>t.remove(); c.appendChild(t);
+    setTimeout(()=>t.remove(),4000);
+  }
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href="login.html"; return; }
+    uid = user.uid;
+    const snap = await getDoc(doc(db,"users",uid));
+    if (!snap.exists()) { window.location.href="login.html"; return; }
+    userData = snap.data();
+    renderProfile();
+  });
+
+  function renderProfile() {
+    const name = `${userData.firstName||""} ${userData.lastName||""}`.trim();
+    const initials = [userData.firstName?.[0],userData.lastName?.[0]].filter(Boolean).join("").toUpperCase()||"?";
+    document.getElementById("profileName").textContent = name || userData.email;
+    document.getElementById("profileEmail").textContent = userData.email;
+    document.getElementById("profileUID").textContent = userData.kexoUID || "—";
+    document.getElementById("editFirst").value = userData.firstName || "";
+    document.getElementById("editLast").value = userData.lastName || "";
+    document.getElementById("editEmail").value = userData.email || "";
+    if (userData.photoURL) {
+      document.getElementById("avatarEl").innerHTML = `
+        <img src="${userData.photoURL}" alt="Profile">
+        <div class="avatar-overlay">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>`;
+    } else {
+      document.getElementById("avatarInitials").textContent = initials;
+    }
+  }
+
+  window.copyUID = () => {
+    navigator.clipboard.writeText(userData.kexoUID||"").then(()=>toast("UID copied!","success"));
+  };
+
+  window.triggerAvatarUpload = () => {
+    const input = document.createElement("input");
+    input.type="file"; input.accept="image/*";
+    input.onchange = async () => {
+      const file = input.files[0]; if (!file) return;
+      if (file.size > 5*1024*1024) { toast("Image too large (max 5MB)","error"); return; }
+      toast("Uploading photo…","info");
+      try {
+        // Get Cloudinary config from Firestore
+        const cfgSnap = await getDoc(doc(db,"settings","global"));
+        const cfg = cfgSnap.exists() ? cfgSnap.data().cloudinary : null;
+        if (!cfg?.cloud_name||!cfg?.upload_preset) {
+          toast("Cloudinary not configured. Contact admin.","error"); return;
+        }
+        const fd=new FormData(); fd.append("file",file); fd.append("upload_preset",cfg.upload_preset);
+        const res=await fetch(`https://api.cloudinary.com/v1_1/${cfg.cloud_name}/image/upload`,{method:"POST",body:fd});
+        const data=await res.json();
+        if (!data.secure_url) throw new Error("Upload failed");
+        await updateDoc(doc(db,"users",uid),{photoURL:data.secure_url});
+        userData.photoURL = data.secure_url;
+        renderProfile();
+        toast("Profile photo updated!","success");
+      } catch(e){ toast(e.message,"error"); }
+    };
+    input.click();
+  };
+
+  window.saveProfile = async () => {
+    const firstName = document.getElementById("editFirst").value.trim();
+    const lastName  = document.getElementById("editLast").value.trim();
+    if (!firstName||!lastName) { toast("Please fill in your name","error"); return; }
+    const btn=document.getElementById("saveBtn");
+    btn.disabled=true; btn.innerHTML=`<div class="spinner"></div> Saving…`;
+    try {
+      await updateDoc(doc(db,"users",uid),{firstName,lastName});
+      userData.firstName=firstName; userData.lastName=lastName;
+      renderProfile();
+      toast("Profile saved!","success");
+    } catch(e){ toast(e.message,"error"); }
+    btn.disabled=false; btn.innerHTML="Save changes";
+  };
+</script>
+</body>
+</html>
