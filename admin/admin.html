@@ -1,1 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kexo AI — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0B0F14;--card:#111827;--border:#1F2937;--border2:#374151;
+      --text:#F9FAFB;--text2:#9CA3AF;--muted:#6B7280;
+      --brand:#4F46E5;--brand-h:#4338CA;--success:#22C55E;--error:#EF4444;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+      font-size:14px;-webkit-font-smoothing:antialiased}
 
+    /* ─── LAYOUT ─── */
+    .layout{display:flex;height:100vh}
+    .sidebar{width:220px;background:var(--card);border-right:1px solid var(--border);
+      display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar-logo{display:flex;align-items:center;gap:8px;padding:20px 16px;
+      border-bottom:1px solid var(--border)}
+    .sidebar-logo img{height:26px;width:auto}
+    .logo-fallback{width:26px;height:26px;background:var(--brand);border-radius:7px;
+      display:flex;align-items:center;justify-content:center}
+    .sidebar-logo-name{font-size:14px;font-weight:700}
+    .admin-badge{font-size:10px;background:rgba(239,68,68,0.15);color:#F87171;
+      padding:2px 7px;border-radius:100px;font-weight:600;margin-left:auto}
+    .nav-section{padding:12px 8px 6px;font-size:10px;font-weight:600;
+      color:var(--muted);text-transform:uppercase;letter-spacing:0.8px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;
+      border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;
+      transition:all 0.1s;margin:1px 8px}
+    .nav-item:hover{background:var(--border);color:var(--text)}
+    .nav-item.active{background:rgba(79,70,229,0.12);color:#818CF8}
+    .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+    .back-link{display:flex;align-items:center;gap:8px;color:var(--text2);
+      text-decoration:none;font-size:13px;transition:color 0.15s}
+    .back-link:hover{color:var(--text)}
+
+    /* ─── MAIN ─── */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{height:56px;background:var(--card);border-bottom:1px solid var(--border);
+      display:flex;align-items:center;padding:0 24px;gap:16px}
+    .topbar-title{font-size:16px;font-weight:700;letter-spacing:-0.2px}
+    .topbar-sub{font-size:13px;color:var(--muted)}
+    .content{flex:1;overflow-y:auto;padding:28px 28px}
+
+    /* ─── STATS ─── */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+    .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .stat-label{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .stat-value{font-size:26px;font-weight:700;letter-spacing:-0.5px}
+    .stat-delta{font-size:12px;color:var(--success);margin-top:4px}
+
+    /* ─── TABLE ─── */
+    .table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+    .table-title{font-size:14px;font-weight:600}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;padding:10px 20px;font-size:11px;font-weight:600;
+      color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;
+      border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2)}
+    td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(31,41,55,0.5)}
+
+    /* ─── SETTINGS ─── */
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .settings-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px}
+    .settings-title{font-size:14px;font-weight:600;margin-bottom:4px}
+    .settings-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+    .field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--border);
+      border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);
+      font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+    .field input:focus,.field select:focus{border-color:var(--brand)}
+    .field input::placeholder{color:var(--muted)}
+
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;
+      padding:12px 0;border-bottom:1px solid var(--border)}
+    .toggle-row:last-child{border-bottom:none}
+    .toggle-label{font-size:13px}
+    .toggle-sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:10px;
+      cursor:pointer;transition:background 0.2s}
+    .toggle input:checked+.toggle-track{background:var(--brand)}
+    .toggle-thumb{position:absolute;left:3px;top:3px;width:14px;height:14px;
+      background:#fff;border-radius:50%;transition:transform 0.2s}
+    .toggle input:checked~.toggle-thumb{transform:translateX(16px)}
+
+    /* ─── BUTTONS ─── */
+    .btn-sm{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;
+      border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;
+      transition:all 0.15s;font-family:'Inter',sans-serif}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary:hover{background:var(--brand-h)}
+    .btn-danger{background:rgba(239,68,68,0.12);color:var(--error);border:1px solid rgba(239,68,68,0.2)}
+    .btn-danger:hover{background:rgba(239,68,68,0.2)}
+    .btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
+    .btn-outline:hover{border-color:var(--border2);color:var(--text)}
+
+    /* ─── BADGES ─── */
+    .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500}
+    .badge-green{background:rgba(34,197,94,0.1);color:#4ADE80}
+    .badge-red{background:rgba(239,68,68,0.1);color:#F87171}
+    .badge-blue{background:rgba(79,70,229,0.1);color:#818CF8}
+
+    /* ─── AVATAR ─── */
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--brand);
+      display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;overflow:hidden}
+    .user-avatar img{width:100%;height:100%;object-fit:cover}
+
+    /* ─── LOADING ─── */
+    .skeleton-line{background:linear-gradient(90deg,var(--border) 25%,var(--border2) 50%,var(--border) 75%);
+      background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;height:13px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* ─── SECTIONS ─── */
+    .section{display:none}
+    .section.active{display:block}
+
+    /* ─── ACCESS DENIED ─── */
+    .access-denied{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      height:100%;gap:16px;text-align:center;padding:40px}
+    .access-denied h2{font-size:20px;font-weight:700;color:var(--error)}
+    .access-denied p{font-size:14px;color:var(--text2);max-width:320px}
+
+    /* responsive */
+    @media(max-width:1024px){.stats-row{grid-template-columns:1fr 1fr}.settings-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ─── SIDEBAR ─── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/logo/logo.svg" alt="Kexo"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="logo-fallback" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </div>
+      <span class="sidebar-logo-name">Kexo AI</span>
+      <span class="admin-badge">Admin</span>
+    </div>
+
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="switchTab('analytics')" id="nav-analytics">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      Analytics
+    </div>
+
+    <div class="nav-section">Manage</div>
+    <div class="nav-item" onclick="switchTab('users')" id="nav-users">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      Users
+    </div>
+    <div class="nav-item" onclick="switchTab('projects')" id="nav-projects">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Projects
+    </div>
+
+    <div class="nav-section">Config</div>
+    <div class="nav-item" onclick="switchTab('settings')" id="nav-settings">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+      Settings
+    </div>
+
+    <div class="sidebar-footer">
+      <a class="back-link" href="../dashboard.html">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back to Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <!-- ─── MAIN ─── -->
+  <div class="main" id="mainArea">
+    <!-- Access denied (shown until auth verified) -->
+    <div class="access-denied" id="accessDenied" style="display:none">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+      <h2>Access Denied</h2>
+      <p>You don't have admin privileges. Please contact your administrator.</p>
+      <a href="../dashboard.html" class="btn-sm btn-outline">Go to Dashboard</a>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar" id="topbar" style="display:none">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Analytics</div>
+        <div class="topbar-sub" id="topbarSub">Platform overview</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <button class="btn-sm btn-outline" onclick="location.reload()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── ANALYTICS ─── -->
+    <div class="content section active" id="section-analytics" style="display:none">
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value" id="statUsers">—</div>
+          <div class="stat-delta" id="statUsersDelta">Loading…</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Total Projects</div>
+          <div class="stat-value" id="statProjects">—</div>
+          <div class="stat-delta">All workspaces</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Blocked Users</div>
+          <div class="stat-value" id="statBlocked">—</div>
+          <div class="stat-delta" style="color:var(--error)">Suspended</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Active Today</div>
+          <div class="stat-value" id="statActive">—</div>
+          <div class="stat-delta">Firestore sessions</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Recent Users</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>User</th><th>Kexo UID</th><th>Email</th><th>Status</th><th>Joined</th>
+            </tr></thead>
+            <tbody id="recentUsersTable">
+              <tr><td colspan="5"><div class="skeleton-line" style="width:60%;margin:8px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── USERS ─── -->
+    <div class="content section" id="section-users" style="display:none">
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">All Users</span>
+          <span class="badge badge-blue" id="userCountBadge">0 users</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>User</th><th>Kexo UID</th><th>Email</th><th>Status</th><th>Joined</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="usersTable">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PROJECTS ─── -->
+    <div class="content section" id="section-projects" style="display:none">
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">All Projects</span>
+          <span class="badge badge-blue" id="projectCountBadge">0 projects</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Project</th><th>Members</th><th>Created By</th><th>Updated</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="projectsTable">
+              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SETTINGS ─── -->
+    <div class="content section" id="section-settings" style="display:none">
+      <div class="settings-grid">
+        <!-- Cloudinary -->
+        <div class="settings-card">
+          <div class="settings-title">☁️ Cloudinary Configuration</div>
+          <div class="settings-sub">Set your Cloudinary credentials for media uploads. These are stored securely in Firestore and fetched dynamically by the frontend.</div>
+          <div class="field">
+            <label>Cloud Name</label>
+            <input type="text" id="cloudName" placeholder="e.g. my-cloud-name">
+          </div>
+          <div class="field">
+            <label>Upload Preset (unsigned)</label>
+            <input type="text" id="uploadPreset" placeholder="e.g. kexo_uploads">
+          </div>
+          <button class="btn-sm btn-primary" onclick="saveCloudinary()">Save Cloudinary Config</button>
+          <p id="cloudSaveMsg" style="font-size:12px;color:var(--success);margin-top:10px;display:none">✓ Saved successfully!</p>
+        </div>
+
+        <!-- Feature Toggles -->
+        <div class="settings-card">
+          <div class="settings-title">⚙️ Feature Toggles</div>
+          <div class="settings-sub">Enable or disable features platform-wide.</div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Voice Notes</div>
+              <div class="toggle-sub">Allow users to record voice notes</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="feat-voice" checked onchange="saveFeatureToggle('voiceNotes', this.checked)">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Invite System</div>
+              <div class="toggle-sub">Allow users to invite collaborators</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="feat-invite" checked onchange="saveFeatureToggle('inviteSystem', this.checked)">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Share Links</div>
+              <div class="toggle-sub">Allow public read-only project links</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="feat-share" checked onchange="saveFeatureToggle('shareLinks', this.checked)">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">New Signups</div>
+              <div class="toggle-sub">Allow new user registrations</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="feat-signup" checked onchange="saveFeatureToggle('newSignups', this.checked)">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Admin Config -->
+        <div class="settings-card">
+          <div class="settings-title">🔐 Admin UID</div>
+          <div class="settings-sub">Your current admin UID from config.js. To change admin, edit the adminUID field in config/config.js.</div>
+          <div class="field">
+            <label>Current Admin UID</label>
+            <input type="text" id="adminUIDDisplay" readonly style="font-family:monospace;font-size:13px">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:999;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:380px;width:100%">
+    <h3 id="confirmTitle" style="font-size:16px;font-weight:700;margin-bottom:8px"></h3>
+    <p id="confirmMsg" style="font-size:13px;color:var(--text2);margin-bottom:20px"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-sm btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-sm btn-danger" id="confirmOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none"></div>
+
+<script src="../config/config.js"></script>
+<script type="module" src="admin.js"></script>
+</body>
+</html>
