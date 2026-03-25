@@ -1,21 +1,20 @@
 /**
  * KEXO AI — Global Config
- * Replace firebaseConfig values with your Firebase project credentials
+ * Firebase credentials filled from your project
  */
 
 const KEXO_CONFIG = {
   // ─── FIREBASE ────────────────────────────────────────────────
   firebase: {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBhylaAKODwI7DUdlX3xp2brQGHMF8wjC4",
+    authDomain: "daily-earning-247cc.firebaseapp.com",
+    projectId: "daily-earning-247cc",
+    storageBucket: "daily-earning-247cc.firebasestorage.app",
+    messagingSenderId: "697676479494",
+    appId: "1:697676479494:android:f1b46565c9839ff1ef9787"
   },
 
   // ─── ADMIN ───────────────────────────────────────────────────
-  // Add your Firebase UID here to grant admin access
   adminUID: "YOUR_ADMIN_UID_HERE",
 
   // ─── APP META ────────────────────────────────────────────────
